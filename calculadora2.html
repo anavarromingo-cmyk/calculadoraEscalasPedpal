@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Integral Cuidados Paliativos Pediátricos</title>
+    <style>
+        :root {
+            --primary: #0056b3; /* Azul ACCA */
+            --secondary: #2c7a7b; /* Teal PaPaS */
+            --tertiary: #2c3e50; /* Gris Oscuro PedCom */
+            --light: #f8f9fa;
+            --border: #dee2e6;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .main-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* --- CABECERA Y DATOS PACIENTE --- */
+        header {
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 { margin: 0; font-size: 1.6rem; }
+        header p { margin: 5px 0 0; opacity: 0.8; font-size: 0.9rem; }
+
+        .patient-data {
+            background-color: #f1f3f5;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* --- NAVEGACIÓN TABS --- */
+        .tabs {
+            display: flex;
+            background-color: #e9ecef;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 15px 20px;
+            transition: 0.3s;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #6c757d;
+            border-top: 4px solid transparent;
+        }
+
+        .tab-btn:hover { background-color: #dee2e6; }
+
+        .tab-btn.active {
+            background-color: var(--white);
+            color: #333;
+        }
+
+        /* Colores específicos por Tab */
+        .tab-btn[data-tab="acca"].active { border-top-color: var(--primary); color: var(--primary); }
+        .tab-btn[data-tab="papas"].active { border-top-color: var(--secondary); color: var(--secondary); }
+        .tab-btn[data-tab="pedcom"].active { border-top-color: var(--tertiary); color: var(--tertiary); }
+
+        /* --- CONTENIDO --- */
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeEffect 0.4s;
+        }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeEffect { from {opacity: 0;} to {opacity: 1;} }
+
+        /* --- ESTILOS DE LAS ESCALAS --- */
+        .scale-title {
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            color: #333;
+        }
+
+        .section-box {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .section-header {
+            padding: 12px 15px;
+            font-weight: 700;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        /* Colores de cabecera de sección según escala */
+        #acca .section-header { background-color: var(--primary); }
+        #papas .section-header { background-color: var(--secondary); }
+        #pedcom .section-header { background-color: var(--tertiary); }
+
+        .item-row {
+            display: flex;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f1f1f1;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .item-row:hover { background-color: #f8f9fa; }
+        .item-row:last-child { border-bottom: none; }
+
+        .item-row label {
+            width: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .item-row input {
+            margin-top: 5px;
+            margin-right: 15px;
+            transform: scale(1.2);
+            flex-shrink: 0;
+        }
+
+        .item-text { flex-grow: 1; }
+
+        .badge-score {
+            margin-left: 15px;
+            background: #e9ecef;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            min-width: 25px;
+            text-align: center;
+            color: #495057;
+        }
+
+        .item-row.selected {
+            background-color: #e2e6ea;
+        }
+        
+        /* Colores de selección específicos */
+        #acca .item-row.selected { background-color: #cfe2ff; }
+        #papas .item-row.selected { background-color: #e6fffa; }
+        #pedcom .item-row.selected { background-color: #e9ecef; }
+
+        /* --- PEDCOM FASE 2 --- */
+        #phase-2-container {
+            display: none;
+            border: 2px solid var(--tertiary);
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+        .phase-notice {
+            background-color: var(--tertiary);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            margin: -20px -20px 20px -20px;
+        }
+
+        /* --- RESULTADOS FOOTER --- */
+        .results-box {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 20px;
+            border-top: 2px solid var(--border);
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            z-index: 1000;
+        }
+
+        .score-info { font-size: 1.1rem; }
+        .total-number { font-size: 2rem; font-weight: 800; line-height: 1; }
+        .interpretation { display: block; font-weight: 600; margin-top: 5px; }
+
+        /* Colores resultados */
+        #acca-score-val { color: var(--primary); }
+        #papas-score-val { color: var(--secondary); }
+        #pedcom-score-val { color: var(--tertiary); }
+
+        .btn-group { display: flex; gap: 10px; }
+        
+        button.btn-action {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .btn-print { background-color: #343a40; }
+        .btn-print:hover { background-color: #23272b; }
+        .btn-reset { background-color: #adb5bd; }
+        .btn-reset:hover { background-color: #868e96; }
+
+        /* --- IMPRESIÓN --- */
+        @media print {
+            body { padding: 0; background: white; }
+            .main-wrapper { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+            .tabs, .btn-group { display: none; }
+            .tab-content { display: none; padding: 0; }
+            .tab-content.active { display: block; }
+            .results-box { position: static; border: 1px solid #000; box-shadow: none; margin-top: 20px; }
+            .item-row:not(.selected) { display: none; } /* Ocultar no seleccionados */
+            .item-row { border-bottom: 1px solid #ddd; }
+            .section-box { border: none; margin-bottom: 10px; }
+            .section-header { color: #000; background: #eee !important; border-bottom: 1px solid #000; }
+            input { display: none; } /* Ocultar radios al imprimir para limpieza */
+            #phase-2-container { display: block !important; border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <header>
+        <h1>Calculadora de Escalas Paliativas Pediátricas</h1>
+        <p>ACCA PED | PaPaS Scale | PedCom Ampliada</p>
+    </header>
+
+    <!-- DATOS DEL PACIENTE (Comunes) -->
+    <div class="patient-data">
+        <div class="form-group">
+            <label>Nombre del Paciente:</label>
+            <input type="text" id="pt_name">
+        </div>
+        <div class="form-group">
+            <label>NHC / ID:</label>
+            <input type="text" id="pt_id">
+        </div>
+        <div class="form-group">
+            <label>Fecha Nacimiento:</label>
+            <input type="date" id="pt_dob">
+        </div>
+        <div class="form-group">
+            <label>Evaluador:</label>
+            <input type="text" id="evaluator">
+        </div>
+        <div class="form-group">
+            <label>Fecha Evaluación:</label>
+            <input type="date" id="eval_date">
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'acca')" data-tab="acca">ACCA PED</button>
+        <button class="tab-btn" onclick="openTab(event, 'papas')" data-tab="papas">Escala PaPaS</button>
+        <button class="tab-btn" onclick="openTab(event, 'pedcom')" data-tab="pedcom">PedCom Ampliada</button>
+    </div>
+
+    <!-- =========================== ACCA PED =========================== -->
+    <div id="acca" class="tab-content active">
+        <h2 class="scale-title">ACCA PED: Evaluación de Necesidades Asistenciales</h2>
+        <div id="acca-container"></div>
+        
+        <div class="results-box">
+            <div class="score-info">
+                Puntuación Total: <span class="total-number" id="acca-score-val">0</span>
+                <span id="acca-interp" class="interpretation">Baja Complejidad</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn-action btn-reset" onclick="resetAcca()">Limpiar</button>
+                <button class="btn-action btn-print" onclick="window.print()">Imprimir Informe</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================== PaPaS =========================== -->
+    <div id="papas" class="tab-content">
+        <h2 class="scale-title">Escala PaPaS: Screening de Cuidados Paliativos</h2>
+        <div id="papas-container"></div>
+
+        <div class="results-box">
+            <div class="score-info">
+                Puntuación Total: <span class="total-number" id="papas-score-val">0</span>
+                <span id="papas-interp" class="interpretation">Monitorización Estándar</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn-action btn-reset" onclick="resetPapas()">Limpiar</button>
+                <button class="btn-action btn-print" onclick="window.print()">Imprimir Informe</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================== PedCom =========================== -->
+    <div id="pedcom" class="tab-content">
+        <h2 class="scale-title">PedCom Ampliada: Crónico Complejo</h2>
+        <div id="pedcom-phase1"></div>
+
+        <div id="phase-2-container">
+            <div class="phase-notice">
+                PACIENTE IDENTIFICADO COMO CRÓNICO COMPLEJO (Puntuación ≥ 6.5).<br>
+                Complete los siguientes ítems para establecer el grado de complejidad.
+            </div>
+            <div id="pedcom-phase2"></div>
+        </div>
+
+        <div class="results-box">
+            <div class="score-info">
+                Puntuación Total: <span class="total-number" id="pedcom-score-val">0</span>
+                <span id="pedcom-interp" class="interpretation">No cumple criterios PCC</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn-action btn-reset" onclick="resetPedcom()">Limpiar</button>
+                <button class="btn-action btn-print" onclick="window.print()">Imprimir Informe</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.getElementById('eval_date').valueAsDate = new Date();
+
+    /* ==========================================================================
+       DATOS: ACCA PED (Literal del PDF 1)
+       ========================================================================== */
+    const accaData = [
+        {
+            title: "VALUACIÓN DE LA RESPIRACIÓN",
+            items: [
+                {t: "Respiración normal (apropiada para la edad), ningún episodio de alteración respiratoria. Uso rutinario de inhaladores, nebulizadores, etc.", s:0},
+                {t: "Episodios de broncoespasmo y tos o dificultad respiratoria, que no responden a tratamientos autogestionados y necesitan intervención especializada. O Necesidad de oxigenoterapia. O Presenta mayor susceptibilidad a infecciones pulmonares. O Requiere fisioterapia diaria para mantener la funcionalidad respiratoria óptima.", s:5},
+                {t: "Es capaz de respirar autónomamente a través de la traqueostomía que viene autogestionada o con la ayuda de operadores/familiares. Vías aéreas permeables pero cánula de traqueostomía estrecha. O Es capaz de respirar autónomamente durante el día pero necesita ventilador mecánico durante la noche. La ventilación puede ser interrumpida incluso hasta 48 horas sin alteraciones clínicas. O Utiliza CPAP (Continuous Positive Airways Pressure).", s:10},
+                {t: "Presenta apneas frecuentes Y/O Dificultad respiratoria que compromete la vida. Extrema dificultad en la respiración, que puede necesitar aspiraciones para mantener libres las vías aéreas, realizadas por un operador competente. O La traqueostomía requiere aspiraciones frecuentes Y/O Requiere ventilación nocturna por capacidad respiratoria limitada, podría sobrevivir a la desconexión accidental pero esto comportaría molestias que requerirían soporte hospitalario Y/O Presenta secreciones excesivas que requieren aspiraciones frecuentes.", s:20},
+                {t: "Incapacidad de respiración autónoma, requiere ventilación mecánica continua. O No presenta impulso respiratorio cuando duerme o está inconsciente y requiere ventilación y presencia de operador 1:1 mientras duerme, ya que la desconexión podría ser fatal. O La traqueostomía es altamente inestable, oclusiones frecuentes, dificultad en la sustitución de la cánula.", s:25}
+            ]
+        },
+        {
+            title: "VALUACIÓN DE LA ALIMENTACIÓN",
+            items: [
+                {t: "Autónomo en la ingesta de alimentos y bebidas por vía oral, alcanza el requerimiento nutricional completo. Adecuada a la edad.", s:0},
+                {t: "Necesita mayor asistencia respecto a la prevista para su edad (ej. el niño se alimenta por boca pero utilizando vaso y cuchara especiales para la palatosquisis). O Necesita supervisión, consejos y aliento para la asunción de alimentos y bebidas, mayor respecto a la prevista para su edad. O El progenitor necesita apoyo y consejos sobre la alimentación ya que el escaso conocimiento actual (incluidas las consecuencias de inhalación de alimentos o bebidas) podría llevar a un empeoramiento importante de la condición base. O Necesita asistencia completa en la alimentación porque su desarrollo no es adecuado, pero esto no requiere mucho tiempo.", s:5},
+                {t: "Necesita asistencia completa en la alimentación para garantizar una adecuada asunción de alimentos y esto requiere mucho tiempo (incluye la administración de alimentos líquidos). O Plan nutricional especial decidido por una (logopeda?).", s:10},
+                {t: "Incapaz de ingerir sólidos o líquidos por vía oral. Se utilizan todos los instrumentos artificiales necesarios para la alimentación (gastrostomía, yeyunostomía), SNG incluido. O Presencia de disfagia que requiere la gestión de un plan terapéutico que prevea intervenciones adicionales para garantizar una adecuada nutrición o hidratación, reduce el riesgo de sofocamiento, inhalación y mantiene la permeabilidad de las vías aéreas ej. aspiración. O Problemas en la asunción de alimentos y bebidas, que requieren intervenciones para garantizar el estado nutricional adecuado. O Pérdida de peso no prevista que comporta riesgos para el niño y requiere intervenciones adecuadas. O Problemas relacionados con el uso de aparatos para la nutrición que requieren reevaluación y revisión.", s:15},
+                {t: "Hidratación y sustancias nutritivas administradas totalmente por vía intravenosa (NPT).", s:20}
+            ]
+        },
+        {
+            title: "VALUACIÓN DE CRISIS CONVULSIVAS O ESTADO ALTERADO DE CONCIENCIA",
+            items: [
+                {t: "Ninguna presencia de convulsiones.", s:0},
+                {t: "Crisis convulsivas bien controladas con la terapia actual.", s:2},
+                {t: "Crisis convulsivas ocasionales o pérdida de conciencia, ocurridas en los últimos tres meses, que han requerido la intervención de personal competente para reducir el riesgo de complicaciones, con o sin la administración de fármacos.", s:5},
+                {t: "Alteración del estado de conciencia o convulsiones, con pérdida de conciencia completa, que requieren frecuentemente (más de una vez al mes) intervenciones específicas para reducir el riesgo de complicaciones y pueden requerir la administración de fármacos por parte de personal competente o de una persona adiestrada (Resolución del problema médico in situ).", s:10},
+                {t: "Necesita cada día intervención por parte de personal competente. Es requerida la intervención médica para identificar e implementar intervenciones adecuadas para resolver los riesgos correlacionados. O El niño tiene crisis convulsivas más de 4 veces a la semana, que requieren intervenciones complejas. (Por intervenciones complejas se entiende diversos métodos de administración de fármacos, que requieren protocolos de seguridad ej. Suministro de oxígeno y aspiración). O El niño en esta categoría es muy inestable (difícil control de la epilepsia).", s:15},
+                {t: "Crisis convulsivas diarias difícilmente controlables o que degeneran en inconsciencia, que no responden a los tratamientos de emergencia y conllevan un alto riesgo para la salud del niño mismo o de los otros (ej. resistente a la administración de Midazolam por vía oral).", s:20}
+            ]
+        },
+        {
+            title: "VALUACIÓN DE LA PIEL E INTEGRIDAD TISULAR",
+            items: [
+                {t: "Ningún signo de lesiones por presión o compromiso cutáneo.", s:0},
+                {t: "Presencia de lesiones por presión o lesiones menores que requieren tratamientos. O Compromiso activo de la piel que requiere al menos un control clínico semanal y que responde al tratamiento.", s:1},
+                {t: "Heridas abiertas, que responden al tratamiento. O Compromiso activo de la piel, que requiere al menos un control semanal y que responde al tratamiento. O Alto riesgo de daño a la piel, que requiere intervenciones preventivas, por parte del personal, varias veces al día, orientadas a evitar el compromiso de la integridad cutánea.", s:3},
+                {t: "Heridas abiertas que no responden a los tratamientos y requieren al menos un control diario. O Compromiso activo de la piel que requiere al menos un control diario. O Medicaciones específicas programadas in situ varias veces a la semana, con respuesta a los tratamientos. O Necesita una supervisión regular por parte de un consultor.", s:4},
+                {t: "Compromiso de la piel o quemaduras peligrosas para la vida del paciente, que requieren intervenciones complejas y dolorosas por un periodo prolongado.", s:5}
+            ]
+        },
+        {
+            title: "VALUACIÓN DEL ESTADO DE MOVILIDAD",
+            items: [
+                {t: "A pesar de su enfermedad el niño se mueve de manera independiente, adecuada a la edad y estadio evolutivo.", s:0},
+                {t: "Capaz de mantener la posición erecta (apropiadamente a la edad y estadio evolutivo) pero necesita de asistencia y soporte para acceder a las actividades escolares y extra.", s:1},
+                {t: "Completamente incapaz de mantener la estación erecta pero hábil para ayudar en los desplazamientos y/o en los cambios de posición o tono muscular reducido que interfiere con el equilibrio o el movimiento.", s:3},
+                {t: "Incapaz de moverse de modo adecuado al estadio evolutivo. Mantenido en una posición (silla o cama) y a causa del riesgo de daño físico, decúbitos o dolor a la movilización necesita de posicionamiento cuidadoso y es incapaz de colaborar o necesita de más de 1 asistente para cambiar posición o ser transportado. O A elevado riesgo de sufrir daños (por tropiezo, caída, etc.) o hiperactividad que requiere un plan de gestión estructurado o una supervisión 1:1. O Contracciones involuntarias que ponen en riesgo al niño y a los asistentes. O Instrumentación / aparatos que limitan la oportunidad de movimiento.", s:5}
+            ]
+        },
+        {
+            title: "VALUACIÓN DE LA COMUNICACIÓN",
+            items: [
+                {t: "Comunica claramente, verbalmente y no, de modo adecuado a sus necesidades evolutivas.", s:0},
+                {t: "Entiende bien en su idioma. Puede haber necesidad de traducción si no es de lengua madre. Sabe entender y comunicar claramente, de palabra y no, en su lengua madre de modo adecuado a su estadio evolutivo.", s:1},
+                {t: "Necesita de incitación para comunicar sus necesidades. La habilidad del niño para entender y comunicar es cónsona a la edad y al estadio evolutivo. Los asistentes pueden ser capaces de anticipar las necesidades mediante signos no verbales ligados a la familiaridad con el niño. Lenguaje expresivo o receptivo.", s:1},
+                {t: "La comunicación de las necesidades elementales es difícil de entender o interpretar, aunque sea solicitada, salvo para las personas que tienen familiaridad con el niño y requiere soporte regular. Uso de métodos comunicativos diversos (ej. lenguaje de señas) por niño con déficit sensorial. Y / O Poner al niño en grado de ser entendido o comunicar sus necesidades elementales, las solicitudes, las ideas requiere frecuente y significativa ayuda por parte de los asistentes y figuras profesionales, incluso con personas cercanas.", s:5}
+            ]
+        },
+        {
+            title: "VALUACIÓN DEL SUEÑO Y DEL DESCANSO",
+            items: [
+                {t: "Ritmo sueño vigilia adecuado a la edad, sin factores de riesgo.", s:0},
+                {t: "Dificultad para establecer una rutina adecuada al ir a la cama y ritmo de sueño adecuados a la edad con recaídas sobre la familia o inquietud que influye en los patrones del sueño.", s:2},
+                {t: "El sueño de los padres / cuidadores, viene a menudo interrumpido a causa del patrón del sueño del niño o de sus necesidades asistenciales.", s:3},
+                {t: "Extrema privación de sueño para los padres / cuidadores, ligada a su condición. Posibles riesgos durante el sueño (apnea, convulsiones, inhalación que requiera aspiración).", s:5}
+            ]
+        },
+        {
+            title: "VALUACIÓN DE LA CONTINENCIA Y DE LA EVACUACIÓN",
+            items: [
+                {t: "Continencia de orina y heces (apropiadas para edad y grado de desarrollo).", s:0},
+                {t: "El cuidado de la continencia se realiza de rutina, día a día y de modo apropiado a la edad; La incontinencia de orina es gestionada por ejemplo a través de fármacos, evacuaciones regulares, absorbentes higiénicos, fundas para el pene, etc.", s:1},
+                {t: "Es capaz de mantener el pleno control de los movimientos intestinales y tiene una estomía estable o puede tener ocasionalmente incontinencia fecal. O BIEN La cura de la continencia es de rutina, pero requiere un monitoreo para reducir al mínimo los riesgos, por ejemplo, aquellos asociados a catéteres urinarios, a doble incontinencia y/o la gestión de grave constipación.", s:5},
+                {t: "El cuidado de la continencia es problemático y requiere una intervención tempestiva por parte de una persona competente.", s:10},
+                {t: "O BIEN Cateterismo complicado/difícil (por ejemplo, es regularmente incontinente de heces más veces al día o tiene una estomía que necesita especial atención más veces al día).", s:15},
+                {t: "Diálisis peritoneal / Hemodiálisis. Después de un procedimiento complicado.", s:20}
+            ]
+        },
+        {
+            title: "VALUACIÓN ADMINISTRACIÓN FÁRMACOS",
+            items: [
+                {t: "Persona competente o fármaco auto-administrado de modo apropiado a la edad.", s:0},
+                {t: "Requiere una persona adecuadamente adiestrada para administrar los fármacos a causa de: Edad, Falta de cumplimiento, Tipo de medicina, Vía de administración del fármaco, Lugar en el que el fármaco debe ser administrado.", s:1},
+                {t: "Requiere administración de un régimen de medicina por parte de una persona competente Y Monitoreo a causa del potencial de fluctuación de la condición médica que puede ser no problemático de gestionar. Y/O Tiene un régimen de tratamiento con fármacos que requiere una gestión por parte de una persona competente a causa de una condición fluctuante y/o inestable o para la gestión del síntoma.", s:3},
+                {t: "Tiene un régimen de tratamiento con fármacos que requiere una gestión diaria por parte de una persona competente y la referencia a un médico para garantizar una gestión eficaz de los síntomas asociados a una condición rápidamente modificable/deteriorable. Y/O Tiene un régimen de tratamiento con fármacos que requiere una gestión diaria por parte de una persona competente y la referencia a un médico para garantizar una gestión eficaz de los síntomas y del dolor, asociados a una condición rápidamente modificable/deteriorable, cuando es requerido un monitoreo 1:1 entre el monitoreo de los síntomas y su gestión.", s:5}
+            ]
+        },
+        {
+            title: "VALUACIÓN DEL DOLOR",
+            items: [
+                {t: "Ningún dolor evidente.", s:0},
+                {t: "Episodios de dolor en las últimas 4 semanas pero controlados con fármacos.", s:1},
+                {t: "Episodios de dolor casi diarios que requieren prescripciones regulares de fármacos para dolor crónico.", s:2},
+                {t: "Episodios de dolor severo-no controlado, que conlleva trastornos de comportamiento (ej. alteraciones ritmo sueño/vigilia) y requiere una gestión del dolor compleja-dolor crónico con exacerbaciones agudas de dolor.", s:3},
+                {t: "Terapia antálgica especializada.", s:5}
+            ]
+        },
+        {
+            title: "VALUACIÓN DE EVENTOS ESPECÍFICOS/IMPREVISTOS Y/O IMPREVISIBLES",
+            items: [
+                {t: "Ningún evento imprevisible.", s:0},
+                {t: "Pueden estar presentes uno o más eventos simultáneamente.", s:20},
+                {t: "Evento repentino/imprevisible que podría conducir a la muerte.", s:50}
+            ]
+        }
+    ];
+
+    /* ==========================================================================
+       DATOS: PaPaS (Literal del PDF 2)
+       ========================================================================== */
+    const papasData = [
+        {
+            title: "Dominio 1: Trayectoria de la Enfermedad",
+            items: [
+                {t: "1.1 Estabilidad: Estable / Impacto bajo en actividades cotidianas", s:0},
+                {t: "1.1 Estabilidad: Deterioro lento sin impacto en actividades cotidianas", s:1},
+                {t: "1.1 Estabilidad: No estable con impacto y limitaciones en actividades cotidianas", s:2},
+                {t: "1.1 Estabilidad: Deterioro significativo con importantes restricciones en actividades", s:4}
+            ]
+        },
+        {
+            title: "Dominio 2: Resultado Esperado y Carga del Tratamiento",
+            items: [
+                {t: "2.1 Resultado esperado: Tratamiento dirigido a la curación (Curativo)", s:0},
+                {t: "2.1 Resultado esperado: Permite el control de la enfermedad, aumentando expectativa y calidad de vida", s:1},
+                {t: "2.1 Resultado esperado: No lleva a la curación ni permite un buen control, pero determina una mejora en la calidad de vida", s:2},
+                {t: "2.1 Resultado esperado: No controla la evolución de la enfermedad y no mejora la calidad de vida", s:4},
+                // Pregunta 2.2
+                {t: "2.2 Carga tratamientos: Inexistente o mínimos problemas", s:0},
+                {t: "2.2 Carga tratamientos: Carga / molestia leve", s:1},
+                {t: "2.2 Carga tratamientos: Carga / molestia media", s:2},
+                {t: "2.2 Carga tratamientos: Carga / molestia alta o excesiva", s:4}
+            ]
+        },
+        {
+            title: "Dominio 3: Síntomas y Problemas Asociados",
+            items: [
+                {t: "3.1 Intensidad síntomas: Paciente asintomático", s:0},
+                {t: "3.1 Intensidad síntomas: Síntomas leves y fácilmente controlables", s:1},
+                {t: "3.1 Intensidad síntomas: Algunos síntomas son moderados y controlables", s:2},
+                {t: "3.1 Intensidad síntomas: Algunos síntomas son graves o difíciles de controlar", s:4},
+                // 3.2 Distress Paciente
+                {t: "3.2 Distress Paciente: Ausente", s:0},
+                {t: "3.2 Distress Paciente: Leve", s:1},
+                {t: "3.2 Distress Paciente: Moderado", s:2},
+                {t: "3.2 Distress Paciente: Importante / Severo", s:4},
+                // 3.3 Distress Familia
+                {t: "3.3 Distress Familia: Ausente", s:0},
+                {t: "3.3 Distress Familia: Leve", s:1},
+                {t: "3.3 Distress Familia: Moderado", s:2},
+                {t: "3.3 Distress Familia: Importante / Severo", s:4}
+            ]
+        },
+        {
+            title: "Dominio 4: Preferencias y Necesidades",
+            items: [
+                {t: "4.1 Preferencias Familia: Desean continuar con todo el tratamiento curativo / No desean cuidados paliativos", s:0},
+                {t: "4.1 Preferencias Familia: Presentan dudas, ambivalencia o desacuerdo sobre el enfoque de cuidado", s:2},
+                {t: "4.1 Preferencias Familia: Desean un enfoque de cuidados paliativos", s:4},
+                // 4.2 Preferencias Equipo
+                {t: "4.2 Preferencias Equipo: Consideran que el paciente NO se beneficiaría de un enfoque paliativo", s:0},
+                {t: "4.2 Preferencias Equipo: Consideran que el paciente SÍ se beneficiaría de un enfoque paliativo", s:4}
+            ]
+        },
+        {
+            title: "Dominio 5: Expectativa de Vida Estimada",
+            items: [
+                {t: "5.1 Expectativa de vida: Algunos años", s:0},
+                {t: "5.1 Expectativa de vida: Meses o 1-2 años", s:1},
+                {t: "5.1 Expectativa de vida: Semanas / Meses", s:3},
+                {t: "5.1 Expectativa de vida: Días / Semanas", s:4},
+                // 5.2 Pregunta Sorpresa
+                {t: "5.2 Pregunta Sorpresa: Sí, me sorprendería (Es probable que viva más)", s:0},
+                {t: "5.2 Pregunta Sorpresa: No, no me sorprendería", s:2}
+            ]
+        }
+    ];
+
+    /* ==========================================================================
+       DATOS: PedCom Ampliada (Literal PDF Tesis)
+       Lógica: 
+       - Fase 1 (1-10): Suma. Si >= 6.5 -> PCC.
+       - Fase 2 (11-12): Si es PCC, mostrar y sumar.
+       - Definición de "mixed": Algunos items son checkbox (se suman), otros son radios (mutuamente excluyentes en subgrupo).
+       ========================================================================== */
+    const pedcomPhase1 = [
+        {
+            title: "1) Atención especializada (al menos una revisión al año)",
+            type: "radio",
+            items: [
+                {t: "Menos de cuatro especialidades médicas o quirúrgicas", s:1},
+                {t: "Cuatro o más especialidades y/o seguimiento por Unidad de Paciente Crónico Complejo y/o Cuidados Paliativos", s:2}
+            ]
+        },
+        {
+            title: "2) Medicación de uso crónico (prescrita por especialista de atención primaria u hospitalaria)",
+            type: "mixed",
+            items: [
+                // Radio group para cantidad
+                {t: "Menos de cinco medicamentos", s:1, group: "cant_meds"},
+                {t: "Cinco o más medicamentos", s:2, group: "cant_meds"},
+                // Checkboxes adicionales
+                {t: "Administración de medicación a través de bomba de infusión subcutánea (p.ej. insulina o inmunoglobulinas)", s:1, group: "check"},
+                {t: "Administración de medicación mediante bomba de infusión intratecal (p.ej. bomba de baclofeno)", s:1, group: "check"},
+                {t: "Medicación o tratamiento de aplicación/administración exclusiva hospitalaria", s:1, group: "check"},
+                {t: "Medicación intravenosa domiciliaria", s:2, group: "check"}
+            ]
+        },
+        {
+            title: "3) Necesidades específicas de alimentación",
+            type: "radio",
+            items: [
+                {t: "Dieta adaptada o de exclusión extensa", s:1},
+                {t: "Alimentación mediante dispositivo de nutrición enteral con posibilidad de fraccionar alimentación durante el día", s:2},
+                {t: "Alimentación mediante dispositivo de nutrición enteral sin posibilidad de fraccionar alimentación durante el día", s:3},
+                {t: "Nutrición parenteral", s:4}
+            ]
+        },
+        {
+            title: "4) Necesidad de cuidados respiratorios específicos (al menos 6 meses)",
+            type: "mixed",
+            items: [
+                {t: "Necesidad de monitorización no invasiva continua o durante el sueño", s:1, group: "check"},
+                {t: "Necesidad de aspiración diaria de secreciones", s:1, group: "check"},
+                {t: "Oxígeno-dependencia (uso continuado o durante el sueño)", s:1, group: "check"},
+                {t: "Paciente portador de traqueostomía", s:3, group: "check"},
+                // Radio group ventilación
+                {t: "Necesidad de ventilación (invasiva o no) que permite desconexiones", s:3, group: "vent"},
+                {t: "Necesidad de ventilación (invasiva o no) que no permite desconexiones (uso > 16 horas/día)", s:4, group: "vent"}
+            ]
+        },
+        {
+            title: "5) Desarrollo psicomotor, problemas de movilidad, limitaciones funcionales",
+            type: "radio",
+            items: [
+                {t: "Retraso psicomotor y/o limitaciones funcionales leves (excluye paraplejia)", s:1},
+                {t: "Retraso psicomotor moderado y/o limitaciones funcionales moderadas (incluye paraplejia)", s:2},
+                {t: "Retraso psicomotor grave y/o limitaciones funcionales graves con alta dependencia", s:3}
+            ]
+        },
+        {
+            title: "6) Patología visual y auditiva",
+            type: "mixed",
+            items: [
+                {t: "Patología visual y/o alteración de la agudeza visual con repercusión en la vida diaria", s:1, group: "check"},
+                {t: "Prótesis auditiva o implante coclear", s:1, group: "check"}
+            ]
+        },
+        {
+            title: "7) Otros dispositivos, técnicas u ostomías (al menos seis meses)",
+            type: "mixed",
+            items: [
+                {t: "Marcapasos y/o desfibrilador implantable", s:1, group: "check"},
+                {t: "Válvula de derivación ventrículo-peritoneal y/o válvula de derivación lumbo-peritoneal", s:1, group: "check"},
+                {t: "Estimulador del nervio vago, estimulador medular y/o estimulador cerebral profundo", s:1, group: "check"},
+                {t: "Reservorio, catéter central (incluido catéter de hemodiálisis y PICC)", s:1, group: "check"},
+                {t: "Catéter de diálisis peritoneal", s:1, group: "check"},
+                {t: "Vesicostomía, ureterostomía, sondaje vesical permanente y/o intermitente", s:1, group: "check"},
+                {t: "Colostomía/Ileostomía", s:1, group: "check"},
+                {t: "Necesidad de irrigación rectal o irrigador transanal, necesidad de enema anterógrado tipo Malone", s:1, group: "check"},
+                {t: "Necesidad de cura de piel o heridas profesionalizada periódica no relacionada con ostomía", s:1, group: "check"},
+                {t: "Necesidad de hemodiálisis o diálisis peritoneal (al menos seis meses o en espera de trasplante)", s:3, group: "check"}
+            ]
+        },
+        {
+            title: "8) Necesidad de terapias específicas",
+            type: "mixed",
+            items: [
+                {t: "Fisioterapia motora, estimulación psicomotriz y/o terapia ocupacional", s:1, group: "check"},
+                {t: "Terapia con logopeda de deglución o lenguaje y/o terapia del lenguaje", s:1, group: "check"},
+                {t: "Fisioterapia respiratoria y/o uso de cough assist", s:1, group: "check"},
+                {t: "Terapia psicológica mantenida o necesidad de seguimiento periódico por Equipo de Salud Mental en el paciente", s:1, group: "check"}
+            ]
+        },
+        {
+            title: "9) Necesidades educativas específicas",
+            type: "radio",
+            items: [
+                {t: "Adaptación curricular significativa", s:0.5},
+                {t: "Centro ordinario en aula específica o centro de educación especial", s:1},
+                {t: "Imposibilidad para acudir a centro escolar, asistir a al menos el 50% de horas lectivas o necesidad de educación a domicilio", s:2},
+                {t: "Imposibilidad para acudir a guardería o necesidad de formación específica en los profesionales para acudir a la misma", s:2}
+            ]
+        },
+        {
+            title: "10) Esperanza de vida",
+            type: "mixed",
+            items: [
+                {t: "Esperanza de vida menor a un año o paciente en el que pueda ser previsible el fallecimiento en los siguientes doce meses", s:4, group: "check"}
+            ]
+        }
+    ];
+
+    const pedcomPhase2 = [
+        {
+            title: "11) Hospitalizaciones en los últimos 12 meses",
+            type: "radio",
+            items: [
+                {t: "Dos hospitalizaciones no programadas y/o una hospitalización mayor a un mes", s:1},
+                {t: "Tres o más hospitalizaciones no programadas, dos mayores a un mes y/o una hospitalización mayor a dos meses", s:2},
+                {t: "Cinco o más hospitalizaciones no programadas, tres o más mayores a un mes y/o una hospitalización mayor a tres meses", s:3}
+            ]
+        },
+        {
+            title: "12) Aspectos sociales, afrontamiento de la enfermedad y relación con el equipo terapéutico",
+            type: "mixed",
+            items: [
+                {t: "Necesidad de terapia o apoyo mantenido por Equipo de Salud Mental en cuidadores", s:1, group: "check"},
+                {t: "Escasa red socio-sanitaria (domicilio a más de una hora del centro de referencia, situación económica desfavorable, escaso soporte social y/o escasa red familiar)", s:1, group: "check"},
+                {t: "Barrera idiomática que dificulta el seguimiento y/o cumplimiento terapéutico", s:1, group: "check"},
+                {t: "Familia disfuncional, cuidadores con necesidad de capacitación y/o situación de sobrecarga mantenida de cuidadores", s:2, group: "check"},
+                {t: "Conflicto de comunicación con el equipo terapéutico, problemas de afrontamiento, diferencias culturales con repercusión sobre el seguimiento/tratamiento del paciente", s:2, group: "check"}
+            ]
+        }
+    ];
+
+    /* ==========================================================================
+       GENERADORES HTML
+       ========================================================================== */
+
+    // Generator para ACCA y PaPaS (Estructura de radio buttons por dominio)
+    function renderSimpleScale(containerId, data, prefix) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        
+        data.forEach((section, index) => {
+            let html = `
+            <div class="section-box">
+                <div class="section-header">${section.title}</div>
+            `;
+            
+            // PaPaS y ACCA son mutuamente excluyentes dentro de cada item/dominio
+            // Pero PaPaS tiene "dominios" con "items" que a su vez tienen opciones.
+            // ACCA tiene "secciones" con "items" opciones.
+            // Vamos a usar name único por sección/item.
+            
+            // Verificamos estructura.
+            // ACCA: Array de Secciones -> Array Items (opciones). Solo 1 opción por sección (Radio). EXCEPT: ACCA can be multiple? No, source ACCA implies "select best fit" usually, but technically ACCA source shows checkboxes in some versions? The previous code used radios. Let's stick to radios per section as standard scoring. 
+            // WAIT: Original ACCA JSON shows "items" as options. So 1 selection per section.
+            
+            // PaPaS: Array de Dominios -> Array Items (Questions) -> Array Options.
+            // My structure for PaPaS above flattened it slightly differently? No, I copied the structure: title -> items.
+            // Let's adjust rendering.
+            
+            // Para ACCA (Flat structure: Sections with options)
+            if (prefix === 'acca') {
+                section.items.forEach((opt, optIndex) => {
+                    html += `
+                    <div class="item-row" onclick="selectRadio(this)">
+                        <label>
+                            <input type="radio" name="${prefix}_q${index}" value="${opt.s}" onchange="calcAcca()">
+                            <span class="item-text">${opt.t}</span>
+                            <span class="badge-score">${opt.s}</span>
+                        </label>
+                    </div>`;
+                });
+            }
+            // Para PaPaS (Deep structure: Domains with Questions with Options)
+            // My data variable `papasData` actually combined "Question" into title or items?
+            // Checking `papasData` above: It is flattened. `title` is Domain Name. `items` are options of specific questions.
+            // BUT wait, Domain 2 has 2 questions. My variable flattened them into one list?
+            // Correction: The PaPaS variable above actually mixed questions into the item list. This is problematic for radio grouping.
+            // Let's check Domain 2 in `papasData`. It has "2.1..." and "2.2...".
+            // If I render them all in one div with one radio group name, user can only pick one for the whole domain.
+            // FIX: I will render PaPaS by grouping manually based on text prefix or just render them as is but need distinct names.
+            
+            if (prefix === 'papas') {
+                // PaPaS data needs sub-grouping logic or manual fix in data.
+                // Let's do a simple fix: use the question prefix (e.g. "1.1") to generate the radio group name.
+                section.items.forEach((opt, optIndex) => {
+                    // Extract "X.X" from start of string to use as group ID
+                    let qID = opt.t.substring(0, 3); 
+                    html += `
+                    <div class="item-row" onclick="selectRadio(this)">
+                        <label>
+                            <input type="radio" name="${prefix}_${qID}" value="${opt.s}" onchange="calcPapas()">
+                            <span class="item-text">${opt.t}</span>
+                            <span class="badge-score">${opt.s}</span>
+                        </label>
+                    </div>`;
+                });
+            }
+
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    // Generator para PedCom (Mezcla Radios y Checkboxes)
+    function renderPedcomScale(containerId, data, prefix) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+
+        data.forEach((section, idx) => {
+            let html = `<div class="section-box"><div class="section-header">${section.title}</div>`;
+            
+            section.items.forEach((item, iIdx) => {
+                let inputType = (section.type === 'radio' || (item.group && item.group !== 'check')) ? 'radio' : 'checkbox';
+                
+                // Name generation
+                let name = "";
+                if (section.type === 'radio') name = `${prefix}_s${idx}`; // Toda la sección es un grupo
+                else if (item.group === 'check') name = `${prefix}_s${idx}_i${iIdx}`; // Checkbox único
+                else name = `${prefix}_s${idx}_${item.group}`; // Subgrupo de radios dentro de mix
+
+                // Event handler
+                let handler = (prefix === 'ped1') ? 'calcPedcom()' : 'calcPedcom()';
+
+                html += `
+                <div class="item-row" onclick="selectRow(this)">
+                    <label>
+                        <input type="${inputType}" name="${name}" value="${item.s}" onchange="calcPedcom()">
+                        <span class="item-text">${item.t}</span>
+                        <span class="badge-score">${item.s}</span>
+                    </label>
+                </div>`;
+            });
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    /* ==========================================================================
+       LÓGICA DE UI
+       ========================================================================== */
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    function selectRadio(div) {
+        const input = div.querySelector('input');
+        input.checked = true;
+        
+        // Visual selection class handling for Radio groups
+        // Find other rows in same section with same radio name and deselect
+        const name = input.name;
+        const allRadios = document.getElementsByName(name);
+        allRadios.forEach(r => {
+            r.closest('.item-row').classList.remove('selected');
+        });
+        div.classList.add('selected');
+
+        // Trigger change event manually
+        input.onchange();
+    }
+
+    function selectRow(div) {
+        const input = div.querySelector('input');
+        if (input.type === 'radio') {
+            selectRadio(div);
+        } else {
+            // Checkbox toggle logic
+            // If user clicked the text/div, toggle checkbox. If clicked input directly, let it be.
+            // But 'label' click handles input toggle automatically. We just need to sync class.
+            // We'll update class based on state after short delay or explicit check
+            setTimeout(() => {
+                if(input.checked) div.classList.add('selected');
+                else div.classList.remove('selected');
+            }, 10);
+            // Trigger change manually if needed, but onchange handles calc
+        }
+    }
+
+    /* ==========================================================================
+       CALCULADORAS
+       ========================================================================== */
+
+    function calcAcca() {
+        let total = 0;
+        // ACCA son radios por sección
+        accaData.forEach((sec, idx) => {
+            const radios = document.getElementsByName(`acca_q${idx}`);
+            for (let r of radios) {
+                if (r.checked) total += parseFloat(r.value);
+            }
+        });
+
+        document.getElementById('acca-score-val').innerText = total;
+        
+        let msg = "";
+        let color = "";
+        // Criterios ACCA (Pag 4 PDF 1): <=29 Baja, 30-49 Media, >=50 Alta
+        if (total <= 29) { msg = "BAJA COMPLEJIDAD (≤ 29)"; color = "#28a745"; }
+        else if (total <= 49) { msg = "MEDIA COMPLEJIDAD (30-49)"; color = "#ffc107"; }
+        else { msg = "ALTA COMPLEJIDAD (≥ 50)"; color = "#dc3545"; }
+
+        const interp = document.getElementById('acca-interp');
+        interp.innerText = msg;
+        interp.style.color = color;
+    }
+
+    function calcPapas() {
+        let total = 0;
+        // Iterar todos los inputs dentro del contenedor papas
+        const container = document.getElementById('papas-container');
+        const inputs = container.querySelectorAll('input:checked');
+        inputs.forEach(i => total += parseFloat(i.value));
+
+        document.getElementById('papas-score-val').innerText = total;
+
+        let msg = "";
+        let color = "";
+        // Criterios PaPaS (Pag 5 PDF 1): 10-14 Intro, 15-24 General, >=25 Especializado
+        if (total < 10) { msg = "Score < 10: Continuar tratamiento estándar"; color = "#28a745"; }
+        else if (total <= 14) { msg = "Score 10-14: Enfoque Paliativo (Introducción)"; color = "#ffc107"; }
+        else if (total <= 24) { msg = "Score 15-24: Cuidados Paliativos Generales"; color = "#fd7e14"; }
+        else { msg = "Score ≥ 25: Cuidados Paliativos Especializados"; color = "#dc3545"; }
+
+        const interp = document.getElementById('papas-interp');
+        interp.innerText = msg;
+        interp.style.color = color;
+    }
+
+    function calcPedcom() {
+        let score1 = 0;
+        let score2 = 0;
+
+        // Fase 1
+        const c1 = document.getElementById('pedcom-phase1');
+        c1.querySelectorAll('input:checked').forEach(i => score1 += parseFloat(i.value));
+
+        // Lógica de Corte PCC (>= 6.5)
+        const isPCC = score1 >= 6.5;
+        const phase2Div = document.getElementById('phase-2-container');
+
+        if (isPCC) {
+            phase2Div.style.display = 'block';
+            // Calcular Fase 2
+            const c2 = document.getElementById('pedcom-phase2');
+            c2.querySelectorAll('input:checked').forEach(i => score2 += parseFloat(i.value));
+        } else {
+            phase2Div.style.display = 'none';
+            // Si se oculta, no reseteamos inputs para no perder datos si oscila, pero score2 es 0 si no se muestra?
+            // Mejor: solo sumar score2 si isPCC es true.
+            score2 = 0; 
+        }
+
+        let total = score1 + score2;
+        document.getElementById('pedcom-score-val').innerText = total;
+
+        const interp = document.getElementById('pedcom-interp');
+        
+        if (!isPCC) {
+            interp.innerText = "No cumple criterios de Paciente Crónico Complejo (< 6.5)";
+            interp.style.color = "#6c757d";
+        } else {
+            let msg = "";
+            let color = "";
+            // Criterios Tesis Pag 138
+            if (total <= 10) { msg = "BAJA COMPLEJIDAD (6.5 - 10)"; color = "#28a745"; }
+            else if (total <= 16) { msg = "MODERADA COMPLEJIDAD (10.5 - 16)"; color = "#ffc107"; }
+            else if (total <= 21) { msg = "ALTA COMPLEJIDAD (16.5 - 21)"; color = "#fd7e14"; }
+            else { msg = "COMPLEJIDAD EXTREMA (> 21.5)"; color = "#dc3545"; }
+
+            interp.innerHTML = "<strong>PACIENTE CRÓNICO COMPLEJO</strong><br>" + msg;
+            interp.style.color = color;
+        }
+    }
+
+    /* ==========================================================================
+       RESET & INIT
+       ========================================================================== */
+    function resetAcca() {
+        renderSimpleScale('acca-container', accaData, 'acca');
+        calcAcca();
+    }
+    function resetPapas() {
+        renderSimpleScale('papas-container', papasData, 'papas');
+        calcPapas();
+    }
+    function resetPedcom() {
+        renderPedcomScale('pedcom-phase1', pedcomPhase1, 'ped1');
+        renderPedcomScale('pedcom-phase2', pedcomPhase2, 'ped2');
+        document.getElementById('phase-2-container').style.display = 'none';
+        calcPedcom();
+    }
+
+    // Inicializar al cargar
+    window.onload = function() {
+        renderSimpleScale('acca-container', accaData, 'acca');
+        renderSimpleScale('papas-container', papasData, 'papas');
+        renderPedcomScale('pedcom-phase1', pedcomPhase1, 'ped1');
+        renderPedcomScale('pedcom-phase2', pedcomPhase2, 'ped2');
+        
+        // Event listener global para actualizar estilos de checkbox
+        document.body.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox') {
+                const row = e.target.closest('.item-row');
+                if(row) {
+                    if(e.target.checked) row.classList.add('selected');
+                    else row.classList.remove('selected');
+                }
+            }
+        });
+    };
+
+</script>
+
+</body>
+</html>
