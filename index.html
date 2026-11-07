@@ -3,262 +3,335 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="color-scheme" content="light">
+    <meta name="author" content="Álvaro Navarro Mingorance">
+    <meta name="description" content="Calculadora Integral PedPal — ACCAPED, Escala PaPaS y PedCom Ampliada para cuidados paliativos pediátricos.">
+
+    <!-- PWA -->
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icon.svg" type="image/svg+xml">
+    <link rel="icon" href="./favicon-32.png" sizes="32x32" type="image/png">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PedPal Escalas">
+
+    <!-- Fuentes PEDPAL -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+
     <title>Calculadora Integral PedPal</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-    <header class="main-header">
-        <nav>
-            <button class="mobile-toggle" id="menu-toggle">☰</button>
-            <ul class="nav-menu">
-                <li><a class="nav-link active" data-target="home"><span class="nav-icon">🏠</span> Inicio</a></li>
-                <li><a class="nav-link" data-target="calculator"><span class="nav-icon">🧮</span> Calculadoras</a></li>
-                <li><a class="nav-link" data-target="credits"><span class="nav-icon">📚</span> Créditos</a></li>
-                <li><a class="nav-link" data-target="legal"><span class="nav-icon">⚖️</span> Legal</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <div class="app-container">
-        <!-- TOP DASHBOARD (Replacing Sidebar) -->
-        <div class="dashboard-bar">
-            <div class="dash-item">
-                <span class="dash-label">ACCAPED</span>
-                <span class="dash-value" id="dash-acca-score">0</span>
-                <span class="dash-interp" id="dash-acca-interp">-</span>
-            </div>
-            <div class="dash-item">
-                <span class="dash-label">PaPaS</span>
-                <span class="dash-value" id="dash-papas-score">0</span>
-                <span class="dash-interp" id="dash-papas-interp">-</span>
-            </div>
-            <div class="dash-item">
-                <span class="dash-label">PedCom</span>
-                <span class="dash-value" id="dash-pedcom-score">0</span>
-                <span class="dash-interp" id="dash-pedcom-interp">-</span>
-            </div>
-            <div class="dash-item action">
-                <button class="btn btn-sm btn-light" onclick="printReport()">🖨 Imprimir Informe</button>
+    <!-- CABECERA STICKY + franja -->
+    <header class="pp-header">
+        <div class="wrap">
+            <div class="bar">
+                <a class="brand" href="#home" aria-label="Inicio PedPal Escalas">
+                    <h1>PedPal<span> Escalas</span></h1>
+                    <p>Calculadora Integral · ACCAPED · PaPaS · PedCom</p>
+                </a>
+                <nav class="pp-top-nav" aria-label="Secciones principales">
+                    <ul>
+                        <li><a class="nav-link active" href="#home" data-target="home">Inicio</a></li>
+                        <li><a class="nav-link" href="#calculator" data-target="calculator">Escalas</a></li>
+                        <li><a class="nav-link" href="#credits" data-target="credits">Créditos</a></li>
+                        <li><a class="nav-link" href="#legal" data-target="legal">Legal</a></li>
+                    </ul>
+                </nav>
             </div>
         </div>
-        <main class="main-content">
+        <div class="franja" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i>
+        </div>
+    </header>
+
+    <!-- DASHBOARD bar con scores -->
+    <div class="dashboard-bar" role="region" aria-label="Resumen de puntuaciones">
+        <div class="dash-item">
+            <span class="dash-label">ACCAPED</span>
+            <span class="dash-value" id="dash-acca-score">0</span>
+            <span class="dash-interp" id="dash-acca-interp">-</span>
+        </div>
+        <div class="dash-item">
+            <span class="dash-label">PaPaS</span>
+            <span class="dash-value" id="dash-papas-score">0</span>
+            <span class="dash-interp" id="dash-papas-interp">-</span>
+        </div>
+        <div class="dash-item">
+            <span class="dash-label">PedCom</span>
+            <span class="dash-value" id="dash-pedcom-score">0</span>
+            <span class="dash-interp" id="dash-pedcom-interp">-</span>
+        </div>
+        <div class="dash-item action">
+            <button class="btn btn-sm btn-primary" onclick="printReport()">Imprimir informe</button>
+        </div>
+    </div>
+
+    <main class="pp-main">
+        <div class="wrap">
 
             <!-- SECTION: HOME -->
-            <section id="home" class="section-container active">
-                <div class="card disclaimer-box" style="text-align: center;">
+            <section id="home" class="section-container active" aria-labelledby="home-title">
+                <div class="card disclaimer-box">
                     <strong>USO EXCLUSIVO PROFESIONAL</strong><br>
-                    Esta herramienta es de uso orientativo y no sustituye el juicio clínico.
+                    Esta herramienta es orientativa y no sustituye el juicio clínico.
                 </div>
 
-                <h1 class="page-title" style="text-align: center; margin-bottom: 30px;">Calculadora Integral PedPal</h1>
+                <h1 class="page-title" id="home-title">Calculadora Integral PedPal</h1>
 
                 <div class="home-grid">
-                    <!-- Card 1 -->
                     <div class="scale-card acca">
                         <h3>ACCAPED</h3>
-                        <p>Evaluación sistemática de necesidades asistenciales complejas (respiración, alimentación,
-                            movilidad, etc.).</p>
+                        <p>Evaluación sistemática de necesidades asistenciales complejas
+                            (respiración, alimentación, movilidad, etc.).</p>
                         <button class="btn btn-primary" onclick="goToScale('acca')">Ir a ACCAPED</button>
                     </div>
 
-                    <!-- Card 2 -->
                     <div class="scale-card papas">
                         <h3>Escala PaPaS</h3>
-                        <p>Paediatric Palliative Screening Scale. Herramienta de cribado para identificar subsidiarios
-                            de cuidados paliativos.</p>
+                        <p>Paediatric Palliative Screening Scale. Cribado para identificar
+                            candidatos a cuidados paliativos.</p>
                         <button class="btn btn-success" onclick="goToScale('papas')">Ir a PaPaS</button>
                     </div>
 
-                    <!-- Card 3 -->
                     <div class="scale-card pedcom">
                         <h3>PedCom</h3>
-                        <p>Identificación y clasificación de complejidad en el Paciente Crónico Complejo (PCC).</p>
-                        <button class="btn btn-primary" style="background-color: var(--warning); border:none;"
-                            onclick="goToScale('pedcom')">Ir a PedCom</button>
+                        <p>Identificación y clasificación de complejidad en el
+                            Paciente Crónico Complejo (PCC).</p>
+                        <button class="btn btn-primary" onclick="goToScale('pedcom')">Ir a PedCom</button>
                     </div>
                 </div>
             </section>
 
             <!-- SECTION: CALCULATOR -->
-            <section id="calculator" class="section-container">
-                <h1 class="page-title">Calculadora Integral</h1>
+            <section id="calculator" class="section-container" aria-labelledby="calc-title">
+                <h1 class="page-title" id="calc-title">Calculadora Integral</h1>
 
-                <!-- PATIENT DATA -->
                 <div class="patient-form">
                     <div class="form-group">
-                        <label>Nombre del Paciente</label>
-                        <input type="text" id="pt_name" placeholder="Nombre o Iniciales">
+                        <label for="pt_name">Nombre del paciente</label>
+                        <input type="text" id="pt_name" placeholder="Nombre o iniciales">
                     </div>
                     <div class="form-group">
-                        <label>NHC / ID</label>
-                        <input type="text" id="pt_id" placeholder="Nº Historia Clínica">
+                        <label for="pt_id">NHC / ID</label>
+                        <input type="text" id="pt_id" placeholder="Nº historia clínica">
                     </div>
                     <div class="form-group">
-                        <label>Fecha Nacimiento</label>
+                        <label for="pt_dob">Fecha nacimiento</label>
                         <input type="date" id="pt_dob">
                     </div>
                     <div class="form-group">
-                        <label>Evaluador</label>
+                        <label for="evaluator">Evaluador</label>
                         <input type="text" id="evaluator" placeholder="Nombre del profesional">
                     </div>
                     <div class="form-group">
-                        <label>Fecha Evaluación</label>
+                        <label for="eval_date">Fecha evaluación</label>
                         <input type="date" id="eval_date">
                     </div>
                 </div>
 
-                <!-- TABS -->
-                <div class="calc-tabs">
-                    <button class="calc-tab-btn active" data-target="acca">ACCA PED</button>
-                    <button class="calc-tab-btn" data-target="papas">Escala PaPaS</button>
-                    <button class="calc-tab-btn" data-target="pedcom">PedCom Ampliada</button>
+                <div class="calc-tabs" role="tablist" aria-label="Escalas disponibles">
+                    <button class="calc-tab-btn active" data-target="acca" type="button">ACCAPED</button>
+                    <button class="calc-tab-btn" data-target="papas" type="button">Escala PaPaS</button>
+                    <button class="calc-tab-btn" data-target="pedcom" type="button">PedCom Ampliada</button>
                 </div>
 
-                <!-- CONTENT: ACCA -->
                 <div id="acca-wrapper" class="calc-content active">
                     <div id="acca-view"></div>
 
-                    <!-- Report Footer ACCA -->
                     <div id="acca-report-footer" class="report-result-box" style="display:none;">
                         <h4>Resultado ACCAPED</h4>
                         <div class="report-score" id="report-acca-score">-</div>
                         <div class="report-interp" id="report-acca-interp">-</div>
                     </div>
 
-                    <div class="actions" style="margin-top: 20px; justify-content: flex-end;">
-                        <button class="btn btn-secondary" onclick="resetScale('acca')">Limpiar ACCA</button>
+                    <div class="actions" style="margin-top: 16px; justify-content: flex-end;">
+                        <button class="btn btn-secondary btn-sm" onclick="resetScale('acca')" type="button">Limpiar ACCAPED</button>
                     </div>
                 </div>
 
-                <!-- CONTENT: PaPaS -->
                 <div id="papas-wrapper" class="calc-content">
                     <div id="papas-view"></div>
 
-                    <!-- Report Footer PaPaS -->
                     <div id="papas-report-footer" class="report-result-box" style="display:none;">
                         <h4>Resultado PaPaS</h4>
                         <div class="report-score" id="report-papas-score">-</div>
                         <div class="report-interp" id="report-papas-interp">-</div>
                     </div>
 
-                    <div class="actions" style="margin-top: 20px; justify-content: flex-end;">
-                        <button class="btn btn-secondary" onclick="resetScale('papas')">Limpiar PaPaS</button>
+                    <div class="actions" style="margin-top: 16px; justify-content: flex-end;">
+                        <button class="btn btn-secondary btn-sm" onclick="resetScale('papas')" type="button">Limpiar PaPaS</button>
                     </div>
                 </div>
 
-                <!-- CONTENT: PedCom -->
                 <div id="pedcom-wrapper" class="calc-content">
                     <div id="pedcom-phase1"></div>
 
                     <div id="phase-2-container">
                         <div class="phase-notice">
-                            PACIENTE IDENTIFICADO COMO CRÓNICO COMPLEJO (Puntuación ≥ 6.5).<br>
+                            PACIENTE IDENTIFICADO COMO CRÓNICO COMPLEJO (puntuación ≥ 6.5).<br>
                             Complete los siguientes ítems para establecer el grado de complejidad.
                         </div>
                         <div id="pedcom-phase2"></div>
                     </div>
 
-                    <!-- Report Footer PedCom -->
                     <div id="pedcom-report-footer" class="report-result-box" style="display:none;">
                         <h4>Resultado PedCom</h4>
                         <div class="report-score" id="report-pedcom-score">-</div>
                         <div class="report-interp" id="report-pedcom-interp">-</div>
                     </div>
 
-                    <div class="actions" style="margin-top: 20px; justify-content: flex-end;">
-                        <button class="btn btn-secondary" onclick="resetScale('pedcom')">Limpiar PedCom</button>
+                    <div class="actions" style="margin-top: 16px; justify-content: flex-end;">
+                        <button class="btn btn-secondary btn-sm" onclick="resetScale('pedcom')" type="button">Limpiar PedCom</button>
                     </div>
                 </div>
 
-                <!-- Disclamer in calculator -->
-                <div style="margin-top: 30px; font-size: 0.8rem; color: #999; text-align: center;">
-                    * Los resultados de estas calculadoras son orientativos y deben ser interpretados por un profesional
-                    sanitario en el contexto clínico del paciente.
-                </div>
-
+                <p style="margin-top: 24px; font-size: 0.82rem; color: var(--pp-ink-muted); text-align: center;">
+                    * Los resultados son orientativos y deben interpretarse por un profesional sanitario en el contexto clínico del paciente.
+                </p>
             </section>
 
             <!-- SECTION: CREDITS -->
-            <section id="credits" class="section-container">
-                <h1 class="page-title">Créditos y Bibliografía</h1>
+            <section id="credits" class="section-container" aria-labelledby="credits-title">
+                <h1 class="page-title" id="credits-title">Créditos y bibliografía</h1>
                 <div class="card">
                     <h3>Bibliografía</h3>
                     <ul class="credits-list">
-                        <li>
-                            <strong>ACCAPED:</strong> Benini F, et al. <em>"Accertamento dei bisogni
-                                Clinico-Assistenziali Complessi in PEDiatria"</em>. Validación italiana de herramienta
-                            de evaluación de complejidad asistencial.
-                        </li>
-                        <li>
-                            <strong>PaPaS Scale:</strong> Bergstraesser E, et al. <em>"Paediatric Palliative Screening
-                                Scale (PaPaS Scale): Assessment of palliative care needs in children with life-limiting
-                                diseases"</em>.
-                        </li>
-                        <li>
-                            <strong>PedCom Ampliada:</strong> Basado en tesis doctoral y publicaciones en <em>Anales de
-                                Pediatría</em> sobre la identificación y clasificación de pacientes crónicos complejos
-                            pediátricos.
-                        </li>
+                        <li><strong>ACCAPED:</strong> Benini F, et al. <em>«Accertamento dei bisogni Clinico-Assistenziali Complessi in PEDiatria»</em>. Validación italiana de herramienta de evaluación de complejidad asistencial.</li>
+                        <li><strong>PaPaS Scale:</strong> Bergstraesser E, et al. <em>«Paediatric Palliative Screening Scale (PaPaS Scale): assessment of palliative care needs in children with life-limiting diseases»</em>.</li>
+                        <li><strong>PedCom Ampliada:</strong> Basado en tesis doctoral y publicaciones en <em>Anales de Pediatría</em> sobre identificación y clasificación de pacientes crónicos complejos pediátricos.</li>
                     </ul>
+                </div>
 
-                    <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
-
+                <div class="card">
                     <h3>Licencia</h3>
-                    <p>Esta aplicación es una obra derivada para uso profesional y docente.</p>
-                    <p>
-                        <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">
-                            <img alt="Licencia de Creative Commons" style="border-width:0"
-                                src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" />
-                        </a><br />
-                        Este obra está bajo una <a rel="license"
-                            href="http://creativecommons.org/licenses/by-nc/4.0/">licencia de Creative Commons
-                            Reconocimiento-NoComercial 4.0 Internacional</a>.
-                    </p>
-                    <p><strong>Autor de la adaptación digital:</strong> Alvaro Navarro</p>
+                    <p>© 2026 Álvaro Navarro Mingorance. Esta aplicación es una obra derivada para uso profesional y docente.</p>
+                    <p>Publicada bajo licencia <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.es" target="_blank" rel="noopener">Creative Commons Reconocimiento-NoComercial 4.0 Internacional (CC BY-NC 4.0)</a>.</p>
+                    <p style="font-size: 0.85rem; color: var(--pp-ink-muted);">La licencia cubre el código y textos propios de la app. El material de referencia (escalas publicadas, manuales y artículos citados) conserva los derechos de sus titulares.</p>
                 </div>
             </section>
 
             <!-- SECTION: LEGAL -->
-            <section id="legal" class="section-container">
-                <h1 class="page-title">Aviso Legal y Clínico</h1>
+            <section id="legal" class="section-container" aria-labelledby="legal-title">
+                <h1 class="page-title" id="legal-title">Aviso legal y clínico</h1>
                 <div class="card disclaimer-box">
                     <strong>AVISO IMPORTANTE:</strong>
-                    <p style="margin-bottom: 0;">El uso de esta aplicación está destinado exclusivamente a profesionales
-                        sanitarios. La información y los cálculos proporcionados tienen carácter meramente orientativo y
-                        no sustituyen en ningún caso el juicio clínico profesional ni el diagnóstico médico. El autor no
-                        se hace responsable del uso inadecuado de esta herramienta ni de las decisiones clínicas tomadas
-                        en base a sus resultados.</p>
+                    <p style="margin: 8px 0 0 0;">El uso de esta aplicación está destinado exclusivamente a profesionales sanitarios. La información y los cálculos tienen carácter orientativo y no sustituyen el juicio clínico ni el diagnóstico médico. El autor no se responsabiliza del uso inadecuado de la herramienta ni de las decisiones clínicas tomadas en base a sus resultados.</p>
                 </div>
                 <div class="card">
-                    <h3>Identidad Corporativa</h3>
-                    <p>El diseño de esta aplicación respeta la identidad visual de <strong>PedPal</strong> (Sociedad
-                        Española de Cuidados Paliativos Pediátricos), utilizando su paleta de colores corporativa para
-                        facilitar su integración en entornos profesionales asociados.</p>
+                    <h3>Identidad</h3>
+                    <p>El diseño sigue el sistema de identidad visual PEDPAL (Sociedad Española de Cuidados Paliativos Pediátricos): tipografías Montserrat y Open Sans, paleta corporativa (naranja, verde, fucsia, azul, marrón) y franja multicolor.</p>
+                </div>
+                <div class="card">
+                    <h3>Instalación como aplicación (PWA)</h3>
+                    <p><strong>Android (Chrome):</strong> abra la URL → menú ⋮ → «Instalar app».</p>
+                    <p><strong>iOS (Safari):</strong> abra la URL → Compartir → «Añadir a pantalla de inicio».</p>
+                    <p style="font-size: 0.85rem; color: var(--pp-ink-muted);">Tras la primera carga, la app funciona sin conexión.</p>
                 </div>
             </section>
 
-            <!-- Footer inside Main Content for Full Width flow or outside? CSS has .main-footer inside body usually. Let's place it after main content div but inside app-container or main-content? -->
-            <footer class="main-footer">
-                <p><strong>Alvaro Navarro 2025 ©</strong></p>
-                <p>
-                    <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"
-                        style="display: inline-block; vertical-align: middle;">
-                        <img alt="Licencia Creative Commons" style="border-width:0"
-                            src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" />
-                    </a>
-                </p>
-                <p style="font-size: 0.8rem; margin-top: 10px;">Diseñado respetando la identidad de PedPal</p>
-            </footer>
+        </div>
+    </main>
 
-        </main>
+    <footer class="pp-foot">
+        <div class="wrap">
+            <p><strong>© 2026 Álvaro Navarro Mingorance</strong></p>
+            <p><a href="https://creativecommons.org/licenses/by-nc/4.0/deed.es" target="_blank" rel="noopener">CC BY-NC 4.0</a> · Diseñado respetando la identidad PEDPAL</p>
+        </div>
+    </footer>
+
+    <div class="franja fina" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i>
     </div>
+
+    <!-- Espacio para no tapar contenido con la bottom nav -->
+    <div class="pp-bottom-pad" aria-hidden="true"></div>
+
+    <!-- NAV INFERIOR fija (móvil/tablet) -->
+    <nav class="pp-bottom-nav" aria-label="Navegación principal (móvil)">
+        <ul>
+            <li>
+                <a class="nav-link active" href="#home" data-target="home" aria-label="Inicio">
+                    <span class="pill-ic" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 L12 3 L21 10 V20 a1 1 0 0 1 -1 1 H4 a1 1 0 0 1 -1 -1 Z"/><path d="M9 21 V12 h6 v9"/></svg>
+                    </span>
+                    <span>Inicio</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-link" href="#calculator" data-target="calculator" aria-label="Escalas">
+                    <span class="pill-ic" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="13" y2="17"/></svg>
+                    </span>
+                    <span>Escalas</span>
+                </a>
+            </li>
+            <li>
+                <button class="nav-link print-btn" type="button" onclick="printReport()" aria-label="Imprimir informe">
+                    <span class="pill-ic" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2 H6 a2 2 0 0 0 -2 2 v16 a2 2 0 0 0 2 2 h12 a2 2 0 0 0 2 -2 V8 Z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>
+                    </span>
+                    <span>Informe</span>
+                </button>
+            </li>
+            <li>
+                <a class="nav-link" href="#credits" data-target="credits" aria-label="Créditos">
+                    <span class="pill-ic" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3 h6 a4 4 0 0 1 4 4 v14 a3 3 0 0 0 -3 -3 H2Z"/><path d="M22 3 h-6 a4 4 0 0 0 -4 4 v14 a3 3 0 0 1 3 -3 h7Z"/></svg>
+                    </span>
+                    <span>Créditos</span>
+                </a>
+            </li>
+            <li>
+                <a class="nav-link" href="#legal" data-target="legal" aria-label="Legal">
+                    <span class="pill-ic" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </span>
+                    <span>Legal</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 
     <!-- SCRIPTS -->
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- Bridge: sincroniza .active entre top-nav y bottom-nav con el mismo data-target -->
+    <script>
+        (function () {
+            function syncNav(target) {
+                document.querySelectorAll('.nav-link[data-target]').forEach(function (el) {
+                    if (el.getAttribute('data-target') === target) el.classList.add('active');
+                    else el.classList.remove('active');
+                });
+            }
+            // Delegación: tras cualquier click sobre un .nav-link con data-target, sincroniza ambos navs
+            document.addEventListener('click', function (e) {
+                var el = e.target.closest('.nav-link[data-target]');
+                if (!el) return;
+                var t = el.getAttribute('data-target');
+                if (!t) return;
+                // app.js ya habrá cambiado el section-container; sincronizamos navs
+                setTimeout(function () { syncNav(t); }, 0);
+            });
+        })();
+
+        // Service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('./sw.js').catch(function () {});
+            });
+        }
+    </script>
 </body>
 
 </html>
